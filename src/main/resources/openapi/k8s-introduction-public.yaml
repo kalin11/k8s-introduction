@@ -1,0 +1,310 @@
+openapi: 3.0.3
+info:
+  title: k8s-introduction-contract
+  description: k8s-introduction-contract
+  version: 1.0.0
+servers:
+  - url: 'http://localhost'
+
+paths:
+  /users:
+    parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Offset'
+    get:
+      summary: getUsers
+      description: Получение всех пользователей с пагинацией
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      summary: getUser
+      description: Получение информации о пользователе
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}/posts:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      summary: getUserPosts
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostsResponse'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+  /posts:
+    post:
+      summary: createPost
+      description: Создание поста
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePostResponse'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/{postId}:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      summary: getPost
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/{postId}/like:
+    patch:
+      summary: likePost
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+
+  /posts/{postId}/dislike:
+    patch:
+      summary: dislikePost
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreatePostRequest:
+      description: Запрос на создание поста
+      type: object
+      required:
+        - userId
+        - content
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
+        content:
+          $ref: '#/components/schemas/PostContent'
+
+    CreatePostResponse:
+      description: Ответ на создание поста
+      type: object
+      required:
+        - userId
+        - content
+        - createdAt
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserId'
+        content:
+          $ref: '#/components/schemas/PostContent'
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+
+    UserPostsResponse:
+      description: Посты пользователя
+      type: object
+      required:
+        - author
+        - posts
+      properties:
+        author:
+          $ref: '#/components/schemas/UserResponse'
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+
+    UserResponse:
+      description: Информация о пользователе
+      type: object
+      required:
+        - name
+        - surname
+      properties:
+        name:
+          type: string
+          description: Имя пользователя
+          minLength: 2
+          maxLength: 100
+          example: Артём
+        surname:
+          type: string
+          description: Фамилия пользователя
+          minLength: 2
+          maxLength: 100
+          example: Лысенко
+
+    Post:
+      type: object
+      description: Пост
+      required:
+        - content
+        - likes
+        - dislikes
+        - createdAt
+      properties:
+        content:
+          type: string
+          description: Содержимое поста
+          minLength: 1
+          example: Очень крутой пост
+        likes:
+          type: integer
+          description: Количество лайков на посте
+          minimum: 0
+          example: 10
+        dislikes:
+          type: integer
+          description: Количество дислайков на посте
+          minimum: 0
+          example: 10
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+
+    Timestamp:
+      type: string
+      format: date-time
+      description: Время
+      example: 2024-07-29T00:00:00Z
+
+    UserId:
+      description: Идентификатор пользователя
+      type: string
+      format: uuid
+
+    PostContent:
+      description: Содержимое поста
+      type: string
+      minLength: 1
+
+    ErrorResponse:
+      type: object
+      description: Описание ответа ошибки
+      required:
+        - errorMessage
+      properties:
+        errorMessage:
+          description: Описание ошибки
+          type: string
+          minLength: 1
+          example: 'Игрок не найден'
+
+  parameters:
+    UserId:
+      description: Идентификатор пользователя
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PostId:
+      description: Идентификатор поста
+      name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Limit:
+      name: limit
+      description: Ограничение "сверху" на количество возвращаемых элементов данных
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+    Offset:
+      name: offset
+      description: Смещение относительно начала
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+
+
+  responses:
+    Error:
+      description: Описание ошибки
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
