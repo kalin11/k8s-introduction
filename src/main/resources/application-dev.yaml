@@ -9,3 +9,11 @@ spring:
     url: ${spring.datasource.url}
     default-schema: public
     change-log: classpath:/db/master-changelog.yaml
+
+cursor:
+  users:
+    default-limit: 10
+    default-offset: 0
+  posts:
+    default-limit: 10
+    default-offset: 0
