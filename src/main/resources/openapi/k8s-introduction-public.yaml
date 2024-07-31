@@ -13,10 +13,10 @@ servers:
 
 paths:
   /users:
-    parameters:
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Offset'
     get:
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
       tags:
         - users
       summary: getUsers
@@ -31,6 +31,31 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserResponse'
+        400:
+          $ref: '#/components/responses/Error'
+        404:
+          $ref: '#/components/responses/Error'
+        500:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - users
+      summary: createUser
+      description: Создание нового пользователя
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
         400:
           $ref: '#/components/responses/Error'
         404:
@@ -185,6 +210,18 @@ paths:
 
 components:
   schemas:
+    CreateUserRequest:
+      description: Запрос на создание нового пользователя
+      type: object
+      required:
+        - name
+        - surname
+      properties:
+        name:
+          $ref: '#/components/schemas/UserName'
+        surname:
+          $ref: '#/components/schemas/UserSurname'
+
     CreatePostRequest:
       description: Запрос на создание поста
       type: object
@@ -230,9 +267,14 @@ components:
       description: Информация о пользователе
       type: object
       required:
+        - id
         - name
         - surname
       properties:
+        id:
+          type: string
+          format: uuid
+          example: a170abf0-f9c9-499d-81eb-a66fe1428b5b
         name:
           type: string
           description: Имя пользователя
@@ -254,6 +296,7 @@ components:
         - likes
         - dislikes
         - createdAt
+        - userid
       properties:
         content:
           type: string
@@ -270,8 +313,35 @@ components:
           description: Количество дислайков на посте
           minimum: 0
           example: 10
+        userId:
+          $ref: '#/components/schemas/UserId'
         createdAt:
           $ref: '#/components/schemas/Timestamp'
+
+    User:
+      description: Пользователь
+      type: object
+      required:
+        - id
+        - name
+        - surname
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a170abf0-f9c9-499d-81eb-a66fe1428b5b
+        name:
+          type: string
+          description: Имя пользователя
+          minLength: 2
+          maxLength: 100
+          example: Артём
+        surname:
+          type: string
+          description: Фамилия пользователя
+          minLength: 2
+          maxLength: 100
+          example: Лысенко
 
     Timestamp:
       type: string
@@ -283,6 +353,16 @@ components:
       description: Идентификатор пользователя
       type: string
       format: uuid
+
+    UserName:
+      description: Имя пользователя
+      type: string
+      minLength: 1
+
+    UserSurname:
+      description: Имя пользователя
+      type: string
+      minLength: 1
 
     PostContent:
       description: Содержимое поста
