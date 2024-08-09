@@ -2,11 +2,13 @@ spring:
   application:
     name: k8s-demo-project
   datasource:
-    url: jdbc:postgresql://localhost:5432
-    username: db_admin
-    password: db_admin
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:k8s-introduction}
+    username: ${DB_USERNAME:db_admin}
+    password: ${DB_PASSWORD:db_admin}
   liquibase:
     url: ${spring.datasource.url}
+    user: ${DB_USERNAME:db_admin}
+    password: ${DB_PASSWORD:db_admin}
     default-schema: public
     change-log: classpath:/db/master-changelog.yaml
 
