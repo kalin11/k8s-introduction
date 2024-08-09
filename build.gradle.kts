@@ -9,7 +9,6 @@ plugins {
 }
 
 group = "ru.kalin"
-version = "0.0.1-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -52,7 +51,7 @@ tasks.withType<Test> {
 }
 
 springBoot {
-    mainClass.set("ru.kalin.k8sdemoproject.K8sDemoProjectApplication.java")
+    mainClass.set("ru.kalin.k8sdemoproject.K8sDemoProjectApplication")
 }
 
 sourceSets {

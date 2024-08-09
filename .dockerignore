@@ -1,0 +1,10 @@
+.git
+.idea
+k8s
+local-env
+target
+
+.gitignore
+.gitlab-ci.yml
+Dockerfile
+README.md
